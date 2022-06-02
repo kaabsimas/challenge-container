@@ -1,0 +1,45 @@
+version: '3.3'
+services:
+    database:
+        image: mysql:5.7
+        restart: unless-stopped
+        ports:
+            - "3306:3306"
+        volumes:
+            - nr_challenge_mysql:/var/lib/mysql
+        environment:
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_USER=${DB_USERNAME}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=root
+
+    php-apache:
+        container_name: php-apache
+        build:
+            context: ./.docker/php
+            dockerfile: Dockerfile
+            args:
+                - PUID=${HOST_PUID}
+                - PGID=${HOST_PGID}
+        user: ${HOST_PUID}
+        ports:
+            - '80:80'
+        volumes:
+            - ./nr-challenge:/var/www/nr-challenge
+            - ./.docker/apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
+        depends_on:
+            - database
+volumes:
+    nr_challenge_mysql:
+        driver: local
+# quando usar php-fpm
+# nginx:
+#     image: nginx:alpine
+#     container_name: blogger-nginx
+#     restart: unless-stopped
+#     ports:
+#         - 8000:80
+#     volumes:
+#         - ./:/var/www/
+#         - ./.docker/nginx/:/etc/nginx/conf.d/
+#     networks:
