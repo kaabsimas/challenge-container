@@ -16,7 +16,7 @@ services:
     php-apache:
         # container_name: php-apache
         build:
-            context: ./.docker/php
+            context: ./.docker/php-apache
             dockerfile: Dockerfile
             args:
                 - PUID=${HOST_PUID}
@@ -28,9 +28,10 @@ services:
         user: ${HOST_PUID}
         ports:
             - '80:80'
+            - '443:443'
         volumes:
             - ./src:/var/www/src
-            - ./.docker/apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
+            - ./.docker/php-apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
         depends_on:
             - database
 volumes:
