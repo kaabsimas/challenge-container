@@ -6,7 +6,7 @@ services:
         ports:
             - "3306:3306"
         volumes:
-            - nr_challenge_mysql:/var/lib/mysql
+            - mysql_volume:/var/lib/mysql
         environment:
             - MYSQL_DATABASE=${DB_DATABASE}
             - MYSQL_USER=${DB_USERNAME}
@@ -14,23 +14,27 @@ services:
             - MYSQL_ROOT_PASSWORD=root
 
     php-apache:
-        container_name: php-apache
+        # container_name: php-apache
         build:
             context: ./.docker/php
             dockerfile: Dockerfile
             args:
                 - PUID=${HOST_PUID}
                 - PGID=${HOST_PGID}
+        extra_hosts: 
+            - "dev.facilitygrid.net:127.0.0.1"
+        hostname: dev.facilitygrid.net
+        domainname: dev.facilitygrid.net
         user: ${HOST_PUID}
         ports:
             - '80:80'
         volumes:
-            - ./nr-challenge:/var/www/nr-challenge
+            - ./src:/var/www/src
             - ./.docker/apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
         depends_on:
             - database
 volumes:
-    nr_challenge_mysql:
+    mysql_volume:
         driver: local
 # quando usar php-fpm
 # nginx:

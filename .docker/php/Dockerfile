@@ -1,12 +1,10 @@
-FROM php:7.2-apache
+FROM php:7.4-apache
 
 ARG PUID
 ARG PGID
 
-# RUN groupadd --force -g $PGID user
-# RUN useradd -ms /bin/bash --no-user-group -G root -u $PUID -g $PGID user
-RUN addgroup --gid $PGID user
-RUN adduser --disabled-password --gecos '' --uid $PUID --gid $PGID user
+RUN addgroup --gid $PGID fgadmin
+RUN adduser --disabled-password --gecos '' --uid $PUID --gid $PGID fgadmin
 # RUN usermod -a -G root,www-data user
 
 RUN apt-get update \
@@ -25,7 +23,9 @@ RUN apt-get update \
         pdo_mysql \
         mysqli
 
+RUN apt-get install -y sudo gnupg gnupg2 vim ca-certificates
+
 RUN curl -sS http://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-USER user
-WORKDIR /var/www/nr-challenge
+USER fgadmin
+WORKDIR /var/www/src
